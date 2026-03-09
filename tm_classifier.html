@@ -8,7 +8,8 @@
 <body>
 
 <img id="image" width="224"/>
-<button onclick="window.AppInventor.setWebViewString('TEST BERHASIL')">
+
+<button onclick="window.AppInventor.setWebViewString('TEST_OK')">
 TEST
 </button>
 
@@ -18,45 +19,45 @@ const URL = "https://teachablemachine.withgoogle.com/models/kEX_9KJjG/";
 
 let model;
 
-function test(){
-   window.AppInventor.setWebViewString("JS WORKING");
-}
+async function loadModel(){
 
-async function loadModel() {
     const modelURL = URL + "model.json";
     const metadataURL = URL + "metadata.json";
 
     model = await tmImage.load(modelURL, metadataURL);
+
+    window.AppInventor.setWebViewString("MODEL_READY");
 }
 
 loadModel();
 
-async function predict(imageSrc) {
+async function predict(imageSrc){
+
+    if(!model){
+        window.AppInventor.setWebViewString("MODEL_NOT_READY");
+        return;
+    }
 
     const img = document.getElementById("image");
     img.src = imageSrc;
 
-    await new Promise(r => setTimeout(r, 500));
+    await new Promise(r => setTimeout(r,500));
 
     const prediction = await model.predict(img);
 
     let best = prediction[0];
 
-    for (let i = 1; i < prediction.length; i++) {
-        if (prediction[i].probability > best.probability) {
+    for(let i=1;i<prediction.length;i++){
+        if(prediction[i].probability > best.probability){
             best = prediction[i];
         }
     }
 
-    window.AppInventor.setWebViewString("MODEL READY");
     window.AppInventor.setWebViewString(best.className);
+
 }
-
-
 
 </script>
 
 </body>
-
 </html>
-
